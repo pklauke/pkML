@@ -57,7 +57,7 @@ class NeuralNet:
         
         # L1 regularization cost
         if lambda_l1 > 0:
-            reg_cost_l1 = np.sum([(np.sum(arr)) for arr in self.parameters_W.values()]) / (y.shape[1])
+            reg_cost_l1 = np.sum([(np.sum(np.abs(arr))) for arr in self.parameters_W.values()]) / (y.shape[1])
         else:
             reg_cost_l1 = 0
             
@@ -84,10 +84,11 @@ class NeuralNet:
         learning_rate : float, optional (default=0.1)
             Parameter that defines the size of the optimization algorithm steps.
         lambda_l1 : float, optional (default=0.0)
-            L1 regularization parameter. Larger values result increase the 
-            regularization effect.
+            L1 regularization parameter. Larger values increase the 
+            regularization effect. Simple sign(x) implementation without 
+            feature sparsity.
         lambda_l2 : float, optional (default=1.0)
-            L2 regularization parameter. Larger values result increase the 
+            L2 regularization parameter. Larger values increase the 
             regularization effect.
         batch_size : int, optional (default=None)
             Size of the batch that is computed before the weights are updated.
@@ -247,7 +248,7 @@ class NeuralNet:
             dz[z <= 0] = 0
         
         m = A_prev.shape[1]
-        dW = 1.0/m * (np.dot(dz, A_prev.T) + lambda_l1 + lambda_l2 * W)
+        dW = 1.0/m * (np.dot(dz, A_prev.T) + lambda_l1*np.sign(W)  + lambda_l2 * W)
         db = 1.0/m * np.sum(dz, axis=1, keepdims=True)
         dA_prev = np.dot(W.T, dz)
             
