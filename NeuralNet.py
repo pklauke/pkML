@@ -4,6 +4,8 @@ def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 def relu(x):
     return np.maximum(0, x)
+def leaky_relu(x):
+    return np.maximum(0.1*x, x)
 
 class NeuralNet:
     """ Simple artificial neural net class for quick prototyping. 
@@ -18,7 +20,7 @@ class NeuralNet:
         supported so far.
     activations : 1D array-like (string), shape = [n_layers]
         Activation functions for each layer. Supported activation functions
-        are 'sigmoid', 'tanh' and 'relu'. Last element should most likely be
+        are 'sigmoid', 'tanh', 'relu' and 'leaky relu'. Last element should most likely be
         'sigmoid'.
     optimizer : string, optional (default='SGD')
         Optimizer algorithm for parameter updating. Default is Stochastic 
@@ -28,7 +30,7 @@ class NeuralNet:
     def __init__(self, layer_dimensions, activations, optimizer = 'SGD'):
         assert( len(layer_dimensions) == len(activations) )
         assert( (len(layer_dimensions) > 0) & (len(activations) > 0) )
-        assert(np.mean([(a in ['sigmoid', 'tanh', 'relu']) for a in activations]) == 1)
+        assert(np.mean([(a in ['sigmoid', 'tanh', 'relu', 'leaky relu']) for a in activations]) == 1)
         assert(optimizer in ['SGD', 'Adam'])
         
         self.layer_dims = layer_dimensions
@@ -207,6 +209,8 @@ class NeuralNet:
                 a = np.tanh(z)
             elif self.activations[l] == 'relu':
                 a = relu(z)
+            elif self.activations[l] == 'leaky relu':
+                a = leaky_relu(z)
             
             self.cache['z' + str(l)] = z
             self.cache['a' + str(l)] = a
@@ -246,6 +250,9 @@ class NeuralNet:
         elif activation == 'relu':
             dz = np.array(dA, copy=True)
             dz[z <= 0] = 0
+        elif activation == 'leaky relu':
+            dz = np.array(dA, copy=True)
+            dz[z < 0] = 0.1 * dz[z < 0]
         
         m = A_prev.shape[1]
         dW = 1.0/m * (np.dot(dz, A_prev.T) + lambda_l1*np.sign(W)  + lambda_l2 * W)
