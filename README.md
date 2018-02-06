@@ -25,7 +25,7 @@ Neural net class for quick prototyping
 
 #### <code>fit(X, y, epochs = 10, learning_rate = 0.1, lambda_l1 = 0, lambda_l2 = 1.0, batch_size = None,random_seed = None, warm_start = False, verbose = 1)</code>
 
-Optimizes the weights for the blending of different models. Returns the weights.<br>
+Train the neural net from the training set (X, y).<br>
 
 <code><b>X</b>: array-like, shape = [n_samples, n_features]</code> <br>
             The training input samples. <br>
