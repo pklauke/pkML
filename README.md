@@ -42,8 +42,6 @@ Optimizes the weights for the blending of different models. Returns the weights.
 <code><b>lambda_l2</b>: float, optional (default=1.0)</code> <br>
             L2 regularization parameter. Larger values increase the 
             regularization effect. <br>
-            <b>learning_rate</b> float, optional (default=0.1) <br>
-            Parameter that defines the size of the optimization algorithm steps.<br>
 <code><b>batch_size</b>: int, optional (default=None)</code> <br>
             Size of the batch that is computed before the weights are updated.
             If no value is given, batch optimization is used. Smaller values
