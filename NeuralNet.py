@@ -45,8 +45,8 @@ class NeuralNet:
         if optimizer is 'Adam':
             self.v = {}
             self.s = {}
-            self.v_corrected = {}                         
-            self.s_corrected = {}
+            self.v_corr = {}                         
+            self.s_corr = {}
             self.beta1 = 0.9
             self.beta2 = 0.999  
             self.epsilon = 1e-8
@@ -149,30 +149,10 @@ class NeuralNet:
 
                     # Backward propagation
                     self.backward_prop(p, y_batch, lambda_l1, lambda_l2)
-
+                    
                     # Update parameters
-                    for l in range(len(layer_dims)):
-                        if self.optimizer is 'SGD':
-                            self.parameters_W[l] = self.parameters_W[l] - learning_rate * self.gradients['dW' + str(l)]
-                            self.parameters_b[l] = self.parameters_b[l] - learning_rate * self.gradients['db' + str(l)]
-                        
-                        elif self.optimizer is 'Adam':
-                            self.t = self.t + 1 # Adam counter
-                            
-                            self.v["dW" + str(l)] = self.beta1 * self.v["dW" + str(l)] + (1-self.beta1) * self.gradients['dW'+ str(l)]
-                            self.v["db" + str(l)] = self.beta1 * self.v["db" + str(l)] + (1-self.beta1) * self.gradients['db'+ str(l)]
+                    self.parameter_update(learning_rate)
 
-                            self.v_corrected["dW" + str(l)] = self.v["dW" + str(l)] / (1 - self.beta1**self.t)
-                            self.v_corrected["db" + str(l)] = self.v["db" + str(l)] / (1 - self.beta1**self.t)
-                            
-                            self.s["dW" + str(l)] = self.beta2 * self.s["dW" + str(l)] + (1-self.beta2) * np.square(self.gradients['dW'+ str(l)])
-                            self.s["db" + str(l)] = self.beta2 * self.s["db" + str(l)] + (1-self.beta2) * np.square(self.gradients['db'+ str(l)])
-                            
-                            self.s_corrected["dW" + str(l)] = self.s["dW" + str(l)] / (1 - self.beta2**self.t)
-                            self.s_corrected["db" + str(l)] = self.s["db" + str(l)] / (1 - self.beta2**self.t)
-                            
-                            self.parameters_W[l] = self.parameters_W[l] - learning_rate * self.v_corrected["dW" + str(l)] / (np.sqrt(self.s_corrected["dW" + str(l)]) + self.epsilon)
-                            self.parameters_b[l] = self.parameters_b[l] - learning_rate * self.v_corrected["db" + str(l)] / (np.sqrt(self.s_corrected["db" + str(l)]) + self.epsilon)
             if verbose >= 1:    
                 cost = self.logloss(self.forward_prop(X), y, lambda_l1, lambda_l2)
                 print('Cost' + str(epoch) + ' : ' + str(cost))
@@ -263,3 +243,28 @@ class NeuralNet:
         
         return dA_prev, dW, db
         
+    def parameter_update(self, learning_rate):
+        
+        for l in range(len(layer_dims)):
+            if self.optimizer is 'SGD':
+                self.parameters_W[l] = self.parameters_W[l] - learning_rate * self.gradients['dW' + str(l)]
+                self.parameters_b[l] = self.parameters_b[l] - learning_rate * self.gradients['db' + str(l)]
+                        
+            elif self.optimizer is 'Adam':
+                self.t = self.t + 1 # Adam counter
+                            
+                self.v["dW" + str(l)] = self.beta1 * self.v["dW" + str(l)] + (1-self.beta1) * self.gradients['dW'+ str(l)]
+                self.v["db" + str(l)] = self.beta1 * self.v["db" + str(l)] + (1-self.beta1) * self.gradients['db'+ str(l)]
+
+                self.v_corr["dW" + str(l)] = self.v["dW" + str(l)] / (1 - self.beta1**self.t)
+                self.v_corr["db" + str(l)] = self.v["db" + str(l)] / (1 - self.beta1**self.t)
+                            
+                self.s["dW" + str(l)] = self.beta2 * self.s["dW" + str(l)] + (1-self.beta2) * np.square(self.gradients['dW'+ str(l)])
+                self.s["db" + str(l)] = self.beta2 * self.s["db" + str(l)] + (1-self.beta2) * np.square(self.gradients['db'+ str(l)])
+                            
+                self.s_corr["dW" + str(l)] = self.s["dW" + str(l)] / (1 - self.beta2**self.t)
+                self.s_corr["db" + str(l)] = self.s["db" + str(l)] / (1 - self.beta2**self.t)
+                            
+                self.parameters_W[l] = self.parameters_W[l] - learning_rate * self.v_corr["dW" + str(l)] / (np.sqrt(self.s_corr["dW" + str(l)]) + self.epsilon)
+                self.parameters_b[l] = self.parameters_b[l] - learning_rate * self.v_corr["db" + str(l)] / (np.sqrt(self.s_corr["db" + str(l)]) + self.epsilon)
+ 
