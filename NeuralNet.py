@@ -87,8 +87,7 @@ class NeuralNet:
             Parameter that defines the size of the optimization algorithm steps.
         lambda_l1 : float, optional (default=0.0)
             L1 regularization parameter. Larger values increase the 
-            regularization effect. Simple sign(x) implementation without 
-            feature sparsity.
+            regularization effect. 
         lambda_l2 : float, optional (default=1.0)
             L2 regularization parameter. Larger values increase the 
             regularization effect.

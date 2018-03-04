@@ -37,8 +37,7 @@ Train the neural net from the training set (X, y).<br>
             Parameter that defines the size of the optimization algorithm steps.<br>
 <code><b>lambda_l1</b>: float, optional (default=0.0)</code> <br>
             L1 regularization parameter. Larger values increase the 
-            regularization effect. Simple sign(x) implementation without 
-            feature sparsity.<br>
+            regularization effect. <br>
 <code><b>lambda_l2</b>: float, optional (default=1.0)</code> <br>
             L2 regularization parameter. Larger values increase the 
             regularization effect. <br>
